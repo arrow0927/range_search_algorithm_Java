@@ -1,0 +1,263 @@
+Old version- of method. not used anymore
+
+
+private void buildTreehelper(ArrayList<RKDTNode> _List, int _depth,
+      int beginIndex, int endIndex, RKDTNode parent)
+  {
+    pr("\n----------------------------------------------------------------");
+    boolean depthIsEven = (_depth % 2 == 0);
+    pr("depth == " + _depth);
+
+    //Case0: node is leaf node================================================
+    if (beginIndex == endIndex)
+    {
+      pr("Case: beginIndex == endIndex -> this is a leafNode");
+      RKDTNode insNode = _List.get(beginIndex);
+
+      pr("parentNode = (" + parent.getX() + "," + parent.getY() + ")");
+      pr("LeafNode = (" + insNode.getX() + "," + insNode.getY() + ")");
+
+      if (!depthIsEven) //if depth is odd -> last comparison was on X 
+      {
+        pr("Compare with parent's X value to determine which child.");
+        if (insNode.getX() <= parent.getX())
+        {
+          if (parent.getLc() == null)
+          {
+            parent.setLc(insNode);
+            pr("*********Inserted leaf Node as Left Child*******");
+          }
+          else
+          {
+            pr("ERROR:COULDN'T INSERT LEAF NODE");
+
+          }
+          return;
+        }
+        else
+        {
+          if (parent.getRc() == null)
+          {
+            parent.setRc(insNode);
+            pr("**********Inserted Leaf Node as right Child*******");
+          }
+          else
+          {
+            pr("ERROR:COULDN'T INSERT LEAF NODE");
+
+          }
+          return;
+        }
+      }
+      else
+      //if depthIsEven -> last comparison was on Y
+      {
+        pr("Compare with parent's Y value to determine which child.");
+        if (insNode.getY() <= parent.getY())
+        {
+          if (parent.getLc() == null)
+          {
+            parent.setLc(insNode);
+            pr("************Inserted leaf Node as Left Child*******");
+          }
+          else
+          {
+            pr("ERROR:COULDN'T INSERT LEAF NODE");
+
+          }
+          return;
+        }
+        else
+        {
+          if (parent.getRc() == null)
+          {
+            parent.setRc(insNode);
+            pr("*************Inserted Leaf Node as right Child*******");
+          }
+          else
+          {
+            pr("ERROR:COULDN'T INSERT LEAF NODE");
+
+          }
+          return;
+        }
+      }
+
+    } //LeafNode
+
+    //DEBUG PURPOSE ONLY================================================
+    if (depthIsEven)
+    {
+      pr("Sorting List on X values, with beginIndex = " + beginIndex
+          + ", endIndex = " + endIndex + ", at depth " + _depth);
+    }
+    else
+    {
+      pr("Sorting List on Y Values, with beginIndex = " + beginIndex
+          + ", endIndex = " + endIndex + ", at depth " + _depth);
+    }
+    //=================================================================
+    //SETUP and sort before next step add 1 to end Index 
+    //because the sort method excludes the endIndex paramters
+
+    Comparator<RKDTNode> c = null;
+    c = depthIsEven ? COMPARE_EVEN : COMPARE_ODD;
+    c = depthIsEven ? JeffCompare.EVEN : JeffCompare.ODD;
+
+    Collections.sort(_List.subList(beginIndex, endIndex + 1), c);
+
+    //adding 1 because the subList method excludes the endIndex
+    pr(_List.subList(beginIndex, endIndex + 1));
+
+    int indexOfMedian = beginIndex
+        + (int) Math.floor((((endIndex - beginIndex) + 1) / 2));
+    RKDTNode medianNode = _List.get(indexOfMedian);
+    System.out.println("");
+    pr("\nSort complete, medianfind complete. \nIndex of Median Node = "
+        + indexOfMedian + " , MedianNode value:" + medianNode.toString() + ")");
+
+    //Case1: Root == null======================================================
+    if (parent == null && _depth == 0)
+    {
+      this.root = medianNode;
+      pr("Set Root Node as" + root.toString() + "\n");
+
+      pr("Building Left Tree");
+      buildTreehelper(_List, _depth + 1, beginIndex, indexOfMedian - 1,
+          this.root);
+      pr("Building Right Tree");
+      buildTreehelper(_List, _depth + 1, indexOfMedian + 1, endIndex, this.root);
+    }
+    else
+    //Case: Root != null==========================================================
+    {
+      if (!depthIsEven) //compare X values
+      {
+        if (medianNode.getX() <= parent.getX()) //medianNode lies to left of parent
+        {
+          pr("Compared X values \n Parent=" + parent.toString()
+              + ", Left Child = " + medianNode.toString());
+          if (parent.getLc() == null)
+          {
+            parent.setLc(medianNode);
+            pr("*********Inserted Node as Left Child*******");
+
+          }
+          else
+          {
+            pr("ERROR:TRIED TO INSERT A LEFT CHILD WHERE ONE ALREADY EXISTS");
+            //buildTreehelper(_List, _depth + 1, beginIndex, endIndex,
+            //parent.getLc());
+          }
+          if (beginIndex <= (indexOfMedian - 1))
+          {
+            pr("Building Left Tree");
+            buildTreehelper(_List, _depth + 1, beginIndex, indexOfMedian - 1,
+                medianNode);
+          }
+          if ((indexOfMedian + 1) <= endIndex)
+          {
+            pr("Building Right Tree");
+            buildTreehelper(_List, _depth + 1, beginIndex, endIndex, medianNode);
+          }
+
+        }
+        else
+        //medianNode lies to the righ of parent
+        {
+          pr("Compared X values \n Parent=" + parent.toString()
+              + ", Right Child = " + medianNode.toString());
+          if (parent.getRc() == null)
+          {
+            parent.setRc(medianNode);
+            pr("*********Inserted Node as Right Child*******");
+          }
+          else
+          {
+            pr("ERROR:TRIED TO INSERT A RIGHT CHILD WHERE ONE ALREADY EXISTS");
+            //buildTreehelper(_List, _depth + 1, beginIndex, endIndex,
+            //parent.getRc());
+
+          }
+          if (beginIndex <= (indexOfMedian - 1))
+          {
+            pr("Building Left Tree");
+            buildTreehelper(_List, _depth + 1, beginIndex, (indexOfMedian - 1),
+                medianNode);
+          }
+
+          if ((indexOfMedian + 1) <= endIndex)
+          {
+            pr("Building Right Tree");
+            buildTreehelper(_List, _depth + 1, (indexOfMedian + 1), endIndex,
+                medianNode);
+          }
+        }
+      }
+      else
+      //compare Y values
+      {
+        if (medianNode.getY() <= parent.getY()) //median node lies to left of parent
+        {
+          pr("Compared Y values\n Parent=" + parent.toString()
+              + ", Left Child = " + medianNode.toString());
+          if (parent.getLc() == null)
+          {
+            parent.setLc(medianNode);
+            pr("*********Inserted  Node as Left Child*******");
+
+          }
+          else
+          {
+            pr("ERROR:TRIED TO INSERT A LEFT CHILD WHERE ONE ALREADY EXISTS");
+            //buildTreehelper(_List, _depth + 1, beginIndex, endIndex,
+            //parent.getLc());
+          }
+          if (beginIndex <= (indexOfMedian - 1))
+          {
+            pr("Building Left Tree");
+            buildTreehelper(_List, _depth + 1, beginIndex, (indexOfMedian - 1),
+                medianNode);
+          }
+          if ((indexOfMedian + 1) <= endIndex)
+          {
+            pr("Building Right Tree");
+            buildTreehelper(_List, _depth + 1, (indexOfMedian + 1), endIndex,
+                medianNode);
+          }
+        }
+        else
+        //median node lies to the right of parents
+        {
+          pr("Compared Y values and Set Right Child: \n Parent="
+              + parent.toString() + ", Right Child = " + medianNode.toString());
+          if (parent.getRc() == null)
+          {
+            parent.setRc(medianNode);
+            pr("*********Inserted  Node as Right Child*******");
+          }
+          else
+          {
+            pr("ERROR:TRIED TO INSERT A RIGHT CHILD WHERE ONE ALREADY EXISTS");
+            //buildTreehelper(_List, _depth + 1, beginIndex, endIndex,
+            //parent.getRc());
+          }
+
+          if (beginIndex <= (indexOfMedian - 1))
+          {
+            pr("Building Left Tree");
+            buildTreehelper(_List, _depth + 1, beginIndex, (indexOfMedian - 1),
+                medianNode);
+          }
+          if ((indexOfMedian + 1) <= endIndex)
+          {
+            pr("Building Right Tree");
+            buildTreehelper(_List, _depth + 1, (indexOfMedian + 1), endIndex,
+                medianNode);
+          }
+        }
+      }
+
+    } //Case: Root != null
+
+  }
