@@ -36,17 +36,21 @@ public class RKDT
       *if depth is even dimension ==X or dimension ==Y
       */
       boolean depthIsEven = (_depth % 2 == 0);
-      Comparator<Node> c = depthIsEven ? NodeComparator.XCOMPARE
+      
+      //Use comparator to see which dimension to sort on
+      Comparator<Node> comparatorObj = depthIsEven ? NodeComparator.XCOMPARE
           : NodeComparator.YCOMPARE;
-      Collections.sort(_List.subList(beginIndex, endIndex2), c);
+      //Create a sublist of the List and sort that sublist on that dimension
+      Collections.sort(_List.subList(beginIndex, endIndex2), comparatorObj);
 
       int indexOfMedian = (beginIndex + endIndex2) / 2;
 
       medianNode = _List.get(indexOfMedian);
-
+      
+      //Recursive call on the left child of the median for the next depth
       medianNode.setLc(buildTreehelper(_List, _depth + 1, beginIndex,
           indexOfMedian));
-
+      //Recursive call on the right child of the median for the next depth
       medianNode.setRc(buildTreehelper(_List, _depth + 1, indexOfMedian + 1,
           endIndex2));
 
@@ -54,10 +58,13 @@ public class RKDT
     return medianNode;
   }
   /*See utility class for query region*/
+  
+  //Method gets the points that belong in the query region supplied
   public ArrayList<Node> getPointsInRange(IRect queryRect)
   {
     ArrayList<Node> tmpArray = new ArrayList<Node>(0);
     int depth = 0;
+    //helper
     searchTreeForMemberPoints(root, depth, tmpArray, queryRect);
     return tmpArray;
 
